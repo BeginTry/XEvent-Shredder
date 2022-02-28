@@ -58,7 +58,7 @@ AllSessionEventFields AS
 	--Global Fields (Actions) across all events for the session.
 	SELECT se.name EventName, sa.name EventField, 'action' AS XmlNodeName, 
 		CASE WHEN x.SqlDataType IS NULL THEN 'text' ELSE 'value' END AS XmlSubNodeName,
-		'Global Fields (Action)' AS FieldType, o.type_name XE_type, 
+		'Global Field' AS FieldType, o.type_name XE_type, 
 		COALESCE(x.SqlDataType, 'NVARCHAR(MAX)') AS SqlDataType
 	FROM sys.server_event_sessions s
 	JOIN sys.server_event_session_events se
@@ -78,7 +78,7 @@ AllSessionEventFields AS
 	 --Event Fields across all events for the session.
 	SELECT se.name EventName, c.name EventField, 'data' AS XmlNodeName, 
 		CASE WHEN x.SqlDataType IS NULL THEN 'text' ELSE 'value' END AS XmlSubNodeName,
-		'Event Fields' AS FieldType, c.type_name XE_type, 
+		'Event Field' AS FieldType, c.type_name XE_type, 
 		COALESCE(x.SqlDataType, 'NVARCHAR(MAX)') AS SqlDataType
 	FROM sys.server_event_sessions s
 	JOIN sys.server_event_session_events se
@@ -121,7 +121,7 @@ SELECT object_name, event_data,
 			')[1]'') AS [' + f.EventField + ']' + CHAR(13) + CHAR(10)
 		ELSE
 			'event_data.value (''(/event/' + f.XmlNodeName + '[@name=''''' + f.EventField + ''''']/' +
-			f.XmlSubNodeName + ')[1]'', ''' + f.SqlDataType + ''') AS [' + f.EventField + ']'
+			f.XmlSubNodeName + ')[1]'', ''' + f.SqlDataType + ''') AS [' + f.EventField + ' (' + f.FieldType + ')]'
 	END + 
 	CASE 
 		WHEN LEAD(f.EventName) OVER(PARTITION BY f.EventName ORDER BY f.EventField) IS NULL THEN 
